@@ -19,10 +19,8 @@ public abstract class Ship {
     }
 
     public boolean isHit(Coordinate coordinate) {
-        return false;
+        return coordinates.contains(coordinate);
     }
-
-    // todo: give coordinates, and checkCoordinates function
 
     public String getAscii(int index) {
         if (horizontalAlignment) {
