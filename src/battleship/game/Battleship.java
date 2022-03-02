@@ -7,6 +7,7 @@ import battleship.player.Player;
 import battleship.ships.Coordinate;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static battleship.IO.Shot.*;
 
@@ -46,13 +47,46 @@ public class Battleship implements Game{
     @Override
     public Game startGame() {
         // play game
-        Player player = players.get(0);
-        player.updateOpponentGrid(new Coordinate(2,2), HIT);
-        player.updateOpponentGrid(new Coordinate(2,3), HIT);
-        player.updateOpponentGrid(new Coordinate(2,4), MISS);
-        player.updateShotsGrid(new Coordinate(2,2));
-        IOUtil.printGrid(player.getOpponentGrid());
+//        Player player = players.get(0);
+//        player.updateOpponentGrid(new Coordinate(2,2), HIT);
+//        player.updateOpponentGrid(new Coordinate(2,3), HIT);
+//        player.updateOpponentGrid(new Coordinate(2,4), MISS);
+//        player.updateShotsGrid(new Coordinate(2,2));
+//        IOUtil.printGrid(player.getOpponentGrid());
         // loop through players
+        // pick a random player to start
+        Player currentPlayer = players.get(new Random().nextInt(0,2));
+        Player otherPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1); // todo maybe change with counter for easier assigning of players
+        State gameState= State.VALID;
+        while (gameState == State.VALID) {// todo only print on human turn
+            if (currentPlayer instanceof HumanPlayer) {
+                // print out boards
+                IOUtil.printGrid(currentPlayer.getGrid());
+                IOUtil.printGrid(currentPlayer.getOpponentGrid());
+            }
+
+            // get coordinate
+            Coordinate shot = currentPlayer.play();
+
+            currentPlayer.updateShotsGrid(shot);
+            boolean hit = otherPlayer.isHit(shot);
+
+            if (currentPlayer instanceof HumanPlayer) {
+                IOUtil.printExclamation(String.format("It's a %s!", hit ? "hit" : "miss")); // todo refactor into multiple lines
+            }
+
+            // update opponentgrid
+            currentPlayer.updateOpponentGrid(shot, (hit ? HIT : MISS));
+
+            // validate gameState
+
+            // change players
+            currentPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
+            otherPlayer = otherPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
+            System.out.println(currentPlayer);
+            System.out.println(otherPlayer);
+        }
+
         return this;
     }
 }
