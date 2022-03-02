@@ -11,7 +11,7 @@ public class HumanPlayer extends Player{
 
     @Override
     public Coordinate play() {
-        String characterArray = "abcdefghji";
+        String characterArray = "abcdefghij";
 
         // get valid coordinate
         while (true) {
