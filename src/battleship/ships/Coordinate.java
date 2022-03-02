@@ -1,5 +1,7 @@
 package battleship.ships;
 
+import java.util.Arrays;
+
 public class Coordinate {
     public int x;
     public int y;
@@ -19,7 +21,12 @@ public class Coordinate {
     }
 
     @Override
+    public int hashCode() {
+        return Arrays.hashCode(new int[]{x, y});
+    }
+
+    @Override
     public String toString() {
-        return String.format("Coordinate: %d, %d", this.x, this.y);
+        return String.format(" [%d, %d] ", this.x, this.y);
     }
 }
