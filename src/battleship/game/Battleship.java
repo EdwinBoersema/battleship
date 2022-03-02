@@ -17,7 +17,8 @@ public class Battleship implements Game{
     public Game createGame() {
         IOUtil.printStartScreen();
         // create players
-        String playerName = IOUtil.askInput("Enter your name: ");
+//        String playerName = IOUtil.askInput("Enter your name: ");
+        String playerName = "Edwin";
         Player human = new HumanPlayer(playerName);
 
         players.add(human);
@@ -25,13 +26,13 @@ public class Battleship implements Game{
 
         IOUtil.printExclamation("Welcome " + playerName + ", we're going to play a game of Battleship.");
         // initialize grids
-        IOUtil.printExclamation("Below you see your board.");
-        IOUtil.printGrid(human.getGrid());
-        IOUtil.printExclamation("");
-        IOUtil.printGrid(human.getGuesses());
+//        IOUtil.printExclamation("Below you see your board.");
+//        IOUtil.printGrid(human.getGrid());
+//        IOUtil.printExclamation("");
+//        IOUtil.printGrid(human.getGuesses());
 
         // fill grids
-
+        human.placeShips();
         return this;
     }
 

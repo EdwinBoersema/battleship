@@ -2,7 +2,7 @@ package battleship.ships;
 
 public class Destroyer extends Ship {
     public Destroyer() {
-        super(2);
+        super("Destroyer", 2);
     }
 
     @Override
