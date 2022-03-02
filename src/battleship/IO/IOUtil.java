@@ -1,5 +1,8 @@
 package battleship.IO;
 
+import battleship.ships.Coordinate;
+
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class IOUtil {
@@ -29,18 +32,18 @@ public class IOUtil {
         System.out.println(exclamation);
     }
 
-    public static void printGrid(String[][] grid) {
+    public static void printGrid(HashMap<Coordinate, String> grid) {
         printHorizontalIdentifiers();
-        for (int i = 1; i <= 10; i++) {
-            System.out.printf("%02d", i);
-            for (int j = 1; j <= 10; j++) {
-                System.out.print("  " + grid[i-1][j-1]);
+        for (int y = 1; y <= 10; y++) {
+            System.out.printf("%02d", y);
+            for (int x = 1; x <= 10; x++) {
+                System.out.print("  " + grid.get(new Coordinate(x,y)));
             }
             System.out.println();
         }
     }
 
     private static void printHorizontalIdentifiers() {
-        System.out.println("    a  b  c  d  e  f  g  h  i  j");
+        System.out.println("    A  B  C  D  E  F  G  H  I  J");
     }
 }
