@@ -11,20 +11,21 @@ public class HumanPlayer extends Player{
 
     @Override
     public Coordinate play() {
-        String characterArray = "ABCDEFGHJI";
+        String characterArray = "abcdefghji";
 
         // get valid coordinate
         while (true) {
             String input = IOUtil.askInput("Type in a coordinate to fire at (e.g. \"C4\"): ");
             // parse 2nd character to int
             try {
-                String letter = input.substring(0,1);
+                String letter = input.substring(0,1).toLowerCase();
                 int y = Integer.parseInt(input.substring(1,2));
                 // check if input matches expected format
-                if (letter.matches("[a-iA-I]") &&
+                if (letter.matches("[a-i]") &&
                         (y > 0 && y <= 10)) {
                     // convert input into coordinate
-                    int x = characterArray.indexOf(letter);
+                    int x = characterArray.indexOf(letter) + 1;
+                    System.out.println(letter + x);
                     Coordinate shot = new Coordinate(x, y);
                     if (shots.contains(shot)) {
                         // if coordinate has been tried already, notify user
