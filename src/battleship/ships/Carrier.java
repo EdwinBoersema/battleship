@@ -2,7 +2,7 @@ package battleship.ships;
 
 public class Carrier extends Ship{
     public Carrier() {
-        super("Carrier", 5);
+        super("Carrier", 5, "<===>", "^║║║v");
     }
 
     @Override
