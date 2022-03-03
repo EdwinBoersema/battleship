@@ -56,9 +56,9 @@ public abstract class Player {
                 grid.replace(coordinate, ship.getAscii(i));
             }
 
-//            System.out.printf("%s at coordinates: ", ship.getName());
-//            coordinates.forEach(System.out::print);
-//            System.out.print("\n");
+            System.out.printf("%s at coordinates: ", ship.getName()); // todo remove after testing
+            coordinates.forEach(System.out::print);
+            System.out.print("\n");
         }
 
     }
@@ -123,7 +123,7 @@ public abstract class Player {
         return !empty;
     }
 
-    public boolean handleHit(Coordinate coordinate) { // todo rename to handleShot and update ship hitCounter if it's a hit
+    public Optional<Ship> handleHit(Coordinate coordinate) { // todo maybe move to Ship and make static methods ???
         // check if the coordinate matches a ship's coordinate
         Optional<Ship> shipOptional = Arrays.stream(ships)
                 .filter(s -> s.isHit(coordinate))
@@ -132,10 +132,10 @@ public abstract class Player {
         shipOptional.ifPresent(Ship::updateHitCounter);
 
         // return whether a ship was hit or not
-        return shipOptional.isPresent();
+        return shipOptional;
     }
 
-    public boolean allShipsAreSunk() {
+    public boolean areAllShipsSunken() {
         return Arrays.stream(ships)
                 .map(Ship::isSunk)
                 .allMatch(b -> b.equals(true));
