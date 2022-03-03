@@ -39,11 +39,11 @@ public abstract class Ship {
     public void updateHitCounter() {
         if (hitCounter < SIZE) {
             hitCounter++;
-        } else if (hitCounter == SIZE) {
-            isSunk = true;
+        }
+        if (hitCounter == SIZE) {
+            this.isSunk = true;
         }
     }
-
 
     public List<Coordinate> getCoordinates() {
         return coordinates;

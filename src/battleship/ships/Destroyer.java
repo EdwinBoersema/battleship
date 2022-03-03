@@ -3,7 +3,7 @@ package battleship.ships;
 public class Destroyer extends Ship {
 
     public Destroyer() {
-        super("Destroyer", 3, "<>", "^v");
+        super("Destroyer", 2, "<>", "^v");
     }
 
     @Override
@@ -23,6 +23,6 @@ public class Destroyer extends Ship {
 
     @Override
     public boolean isSunk() {
-        return false;
+        return isSunk;
     }
 }

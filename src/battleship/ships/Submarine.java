@@ -23,6 +23,6 @@ public class Submarine extends Ship {
 
     @Override
     public boolean isSunk() {
-        return false;
+        return isSunk;
     }
 }

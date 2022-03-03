@@ -23,6 +23,6 @@ public class Battleship extends Ship {
 
     @Override
     public boolean isSunk() {
-        return false;
-    } // todo update with hitCounter
+        return isSunk;
+    }
 }
