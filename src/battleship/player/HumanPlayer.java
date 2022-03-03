@@ -37,7 +37,7 @@ public class HumanPlayer extends Player{
                     // if not, notify player and get input again
                     System.out.println("Invalid input, a valid input would be: \"E3\"");
                 }
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                 System.out.println("Invalid input, a valid input would be: \"E3\"");
             }
         }
