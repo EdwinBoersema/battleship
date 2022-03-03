@@ -1,6 +1,7 @@
 package battleship.player;
 
 import battleship.IO.Shot;
+import battleship.game.State;
 import battleship.ships.*;
 
 import java.util.*;
@@ -9,17 +10,15 @@ import java.util.stream.Stream;
 
 public abstract class Player {
     protected HashMap<Coordinate, String> grid;
-    protected HashMap<Coordinate, String> opponentGrid;
+    protected HashMap<Coordinate, String> opponentGrid; // todo move to human player
     protected Ship[] ships;
     protected String name;
     protected List<Coordinate> shots = new ArrayList<>();
-    // todo: add gridShots | Ship coordinates
 
     public Player(String name) {
         this.name = name;
         this.createGrids();
         this.createShips();
-        this.placeShips();
     }
 
     private void createGrids() {
@@ -124,21 +123,43 @@ public abstract class Player {
         return !empty;
     }
 
+    public boolean handleHit(Coordinate coordinate) { // todo rename to handleShot and update ship hitCounter if it's a hit
+        // check if the coordinate matches a ship's coordinate
+        Optional<Ship> shipOptional = Arrays.stream(ships)
+                .filter(s -> s.isHit(coordinate))
+                .findFirst();
+        // if the optional has a ship, update ship's hitCounter
+        shipOptional.ifPresent(Ship::updateHitCounter);
+
+        // return whether a ship was hit or not
+        return shipOptional.isPresent();
+    }
+
+    public boolean allShipsAreSunk() {
+        return Arrays.stream(ships)
+                .map(Ship::isSunk)
+                .allMatch(b -> b.equals(true));
+    }
+
     // getters and setters
 
     public List<Coordinate> getShipCoordinates() {
-        return Stream.of(
-                ships[0].getCoordinates(),
-                ships[1].getCoordinates(),
-                ships[2].getCoordinates(),
-                ships[3].getCoordinates(),
-                ships[4].getCoordinates())
+        return Arrays.stream(ships)
+                .map(Ship::getCoordinates)
                 .flatMap(Collection::stream)
                 .toList();
     }
 
     public HashMap<Coordinate, String> getGrid() {
         return grid;
+    }
+
+    public List<Coordinate> getShots() {
+        return shots;
+    }
+
+    public void updateGrid(Coordinate coordinate, Shot shot) {
+        grid.put(coordinate, shot.value);
     }
 
     public HashMap<Coordinate, String> getOpponentGrid() {
@@ -153,5 +174,5 @@ public abstract class Player {
         shots.add(coordinate);
     }
 
-    public abstract void play();
+    public abstract Coordinate play();
 }
