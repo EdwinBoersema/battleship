@@ -28,7 +28,6 @@ public class Battleship implements Game{
 //        String playerName = IOUtil.askInput("Enter your name: ");
         String playerName = "Edwin";// todo remove after testing
         Player human = new HumanPlayer(playerName);
-        human.placeShips(); // todo remove after testing
 
         players.add(human);
         players.add(new ComputerPlayer());
@@ -41,10 +40,8 @@ public class Battleship implements Game{
         IOUtil.printExclamation("An 'X' marks a hit, a '+' marks a miss.");
         IOUtil.printGrid(human.getOpponentGrid());
 
-        // fill grids
-        players.get(1).placeShips();
-        // todo >> ask player to place ships
-//        players.get(0).placeShips();
+        // place ships
+        players.forEach(Player::placeShips);
         return this;
     }
 
