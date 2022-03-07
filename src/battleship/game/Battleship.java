@@ -27,7 +27,7 @@ public class Battleship implements Game{
         // create players
 //        String playerName = IOUtil.askInput("Enter your name: ");
         String playerName = "Edwin";// todo remove after testing
-        Player human = new HumanPlayer(playerName);
+        HumanPlayer human = new HumanPlayer(playerName);
 
         players.add(human);
         players.add(new ComputerPlayer());
@@ -49,9 +49,10 @@ public class Battleship implements Game{
         currentPlayer = players.get(new Random().nextInt(0,2));
         nextPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
         while (gameState == State.VALID) {
+            // print out boards if the current player is a human player
             if (currentPlayer instanceof HumanPlayer) {
-                // print out boards
-                IOUtil.printDisplays(currentPlayer.getGrid(), currentPlayer.getOpponentGrid());
+                HumanPlayer player = (HumanPlayer) currentPlayer;
+                IOUtil.printDisplays(player.getGrid(), player.getOpponentGrid());
             }
 
             // get coordinate
@@ -84,11 +85,15 @@ public class Battleship implements Game{
         return this;
     }
 
+    // todo add comments
     private void updateGrids(Coordinates coordinate, boolean hit, Player currentPlayer, Player nextPlayer) {
         var symbol = hit ? "X" : "+";
         currentPlayer.updateShotsGrid(coordinate);
-        currentPlayer.updateOpponentGrid(coordinate, symbol);
-        nextPlayer.updateGrid(coordinate, symbol);
+        if (currentPlayer instanceof HumanPlayer) {
+            ((HumanPlayer) currentPlayer).updateOpponentGrid(coordinate, symbol);
+        } else {
+            ((HumanPlayer) nextPlayer).updateGrid(coordinate, symbol);
+        }
     }
 
     private void validateGameState() {
