@@ -43,27 +43,34 @@ public abstract class Player {
     // check horizontal coordinates
     protected List<Coordinates> checkHorizontalCoordinates(Coordinates startingCoordinate, int length) {
         // determine the number of integers generated
-        int end = (startingCoordinate.x + length) >= 10 ? 10 - startingCoordinate.x : length;
-
+        int limit = getLimit(startingCoordinate.x, length);
         // get empty coordinates
         return Stream.iterate(startingCoordinate.x, n -> n + 1)
-                .limit(end)
+                .limit(limit)
                 .map(x -> new Coordinates(x, startingCoordinate.y))
                 .filter(this::isEmpty)
                 .toList();
     }
 
     // check vertical coordinates
-    protected List<Coordinates> checkVerticalCoordinates(Coordinates startingCoordinate, int length) {
+    protected List<Coordinates> checkVerticalCoordinates(Coordinates startingCoordinate, int length) { // fixme doesn't properly work
         // determine the number of integers generated
-        int end = (startingCoordinate.y + length) >= 10 ? 10 - startingCoordinate.y : length;
-
+        int limit = getLimit(startingCoordinate.y, length);
         // get empty coordinates
         return Stream.iterate(startingCoordinate.y, n -> n + 1)
-                .limit(end)
+                .limit(limit)
                 .map(y -> new Coordinates(startingCoordinate.x, y))
                 .filter(this::isEmpty)
                 .toList();
+    }
+
+    private int getLimit(int start, int length) {
+        int end = start + length - 1;
+        if (end > 10) {
+            return 10 - start;
+        } else {
+            return length;
+        }
     }
 
     public boolean isEmpty(Coordinates coordinate) {
