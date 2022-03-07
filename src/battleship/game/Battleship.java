@@ -4,17 +4,16 @@ import battleship.IO.IOUtil;
 import battleship.player.ComputerPlayer;
 import battleship.player.HumanPlayer;
 import battleship.player.Player;
-import battleship.ships.Coordinate;
+import battleship.ships.Coordinates;
 import battleship.ships.Ship;
 
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
 
-import static battleship.IO.Shot.*;
-
 public class Battleship implements Game{
     private ArrayList<Player> players = new ArrayList<>();
+
 
     public Battleship() {
     }
@@ -49,21 +48,14 @@ public class Battleship implements Game{
 
     @Override
     public Game startGame() {
-        // play game
-//        Player player = players.get(0);
-//        player.updateOpponentGrid(new Coordinate(2,2), HIT);
-//        player.updateOpponentGrid(new Coordinate(2,3), HIT);
-//        player.updateOpponentGrid(new Coordinate(2,4), MISS);
-//        player.updateShotsGrid(new Coordinate(2,2));
-//        IOUtil.printGrid(player.getOpponentGrid());
         // loop through players
         // pick a random player to start
-//        Player currentPlayer = players.get(new Random().nextInt(0,2));
-//        Player otherPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1); // todo maybe change with counter for easier assigning of players
-        Player currentPlayer = players.get(0);
-        Player otherPlayer = players.get(1);
+        Player currentPlayer = players.get(new Random().nextInt(0,2)); // todo refactor into instance variables
+        Player otherPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1); // todo maybe change with counter for easier assigning of players
+//        Player currentPlayer = players.get(0);
+//        Player otherPlayer = players.get(1);
         State gameState= State.VALID;
-        while (gameState == State.VALID) {// todo only print on human turn
+        while (gameState == State.VALID) {
             if (currentPlayer instanceof HumanPlayer) {
                 // print out boards
                 IOUtil.printGrid(currentPlayer.getGrid());
@@ -71,43 +63,51 @@ public class Battleship implements Game{
             }
 
             // get coordinate
-            Coordinate coordinate = currentPlayer.play();
+            Coordinates coordinate = currentPlayer.play();
 
             // check if a ship is hit
             Optional<Ship> shipOptional = otherPlayer.handleHit(coordinate);
+            // set name and shot variables depending on the Optional
+            Ship ship = shipOptional.orElse(null);
 
-            if (currentPlayer instanceof HumanPlayer) { // todo notify player of the computers guess --> move to first line before new turn or wait a bit...
-                IOUtil.printExclamation(String.format("It's a %s!", shipOptional.isPresent() ? "hit" : "miss")); // todo refactor into multiple lines
-                // print out an extra message if a ship was sunk
-                if (shipOptional.isPresent() && shipOptional.get().isSunk()) { // fixme always prints out the ship even if it didn't sink yet...
-                    String message = String.format("You sunk the enemies %s!", shipOptional.get().getName());
-                    IOUtil.printExclamation(message);
-                }
+            //print out result
+            String message = currentPlayer.notify(shipOptional.isPresent(), ship);
+            IOUtil.printExclamation(message);
+            if (currentPlayer instanceof ComputerPlayer) {
+                ((ComputerPlayer) currentPlayer).sleep(1);
             }
 
             // update grids
-            currentPlayer.updateShotsGrid(coordinate);
-            currentPlayer.updateOpponentGrid(coordinate, (shipOptional.isPresent() ? HIT : MISS));
-            otherPlayer.updateGrid(coordinate, (shipOptional.isPresent() ? HIT : MISS));
-            System.out.println(currentPlayer.getShots());
+            updateGrids(coordinate, shipOptional.isPresent(), currentPlayer, otherPlayer);
 
-            // validate gameState
+            // validate gameState // todo refactor into method
             if (otherPlayer.areAllShipsSunken()) {
                 Player playerOne = players.get(0);
                 gameState = currentPlayer.equals(playerOne) ? State.PLAYER_ONE_WON : State.PLAYER_TWO_WON;
             }
 
-            // change players
-//            currentPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
-//            otherPlayer = otherPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
-//            System.out.println(currentPlayer);
-//            System.out.println(otherPlayer);
+            // change players // todo refactor into method
+            currentPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
+            otherPlayer = otherPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
         }
 
         // print out end message
+        String winner;
+        if (gameState == State.PLAYER_ONE_WON) { // todo move to IOUtils
+            winner = players.get(0).getName();
+        } else {
+            winner = players.get(1).getName();
+        }
+        IOUtil.printExclamation(String.format("%s has won!", winner));
 
         return this;
     }
 
-    // todo add function to handle a players turn, this is getting too complicated
+    private void updateGrids(Coordinates coordinate, boolean hit, Player currentPlayer, Player otherPlayer) {
+        var symbol = hit ? "X" : "+";
+        currentPlayer.updateShotsGrid(coordinate);
+        currentPlayer.updateOpponentGrid(coordinate, symbol);
+        otherPlayer.updateGrid(coordinate, symbol);
+    }
+
 }

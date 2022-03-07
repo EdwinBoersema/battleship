@@ -1,6 +1,6 @@
 package battleship.IO;
 
-import battleship.ships.Coordinate;
+import battleship.ships.Coordinates;
 
 import java.util.HashMap;
 import java.util.Scanner;
@@ -30,14 +30,15 @@ public class IOUtil {
 
     public static void printExclamation(String exclamation) {
         System.out.println(exclamation);
+        System.out.print("\n");
     }
 
-    public static void printGrid(HashMap<Coordinate, String> grid) {
+    public static void printGrid(HashMap<Coordinates, String> grid) {
         printHorizontalIdentifiers();
         for (int y = 1; y <= 10; y++) {
             System.out.printf("%02d", y);
             for (int x = 1; x <= 10; x++) {
-                System.out.print("  " + grid.get(new Coordinate(x,y)));
+                System.out.print("  " + grid.get(new Coordinates(x,y)));
             }
             System.out.println();
         }

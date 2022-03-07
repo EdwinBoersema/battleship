@@ -17,7 +17,7 @@ public class Cruiser extends Ship {
     }
 
     @Override
-    public boolean isHit(Coordinate coordinate) {
+    public boolean isHit(Coordinates coordinate) {
         return super.isHit(coordinate);
     }
 

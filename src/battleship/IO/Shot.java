@@ -4,9 +4,9 @@ public enum Shot {
     MISS("+"),
     HIT("X");
 
-    public final String value;
+    public final String symbol;
 
-    private Shot(String value) {
-        this.value = value;
+    Shot(String symbol) {
+        this.symbol = symbol;
     }
 }

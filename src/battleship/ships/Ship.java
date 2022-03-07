@@ -7,7 +7,7 @@ public abstract class Ship {
     private final String horizontalAscii;
     private final String verticalAscii;
     private boolean horizontalAlignment;
-    private List<Coordinate> coordinates = new ArrayList<>();
+    private List<Coordinates> coordinates = new ArrayList<>();
     protected final String NAME;
     protected final int SIZE;
     protected int hitCounter = 0;
@@ -32,7 +32,7 @@ public abstract class Ship {
         this.horizontalAlignment = alignment;
     }
 
-    public boolean isHit(Coordinate coordinate) {
+    public boolean isHit(Coordinates coordinate) {
         return coordinates.contains(coordinate);
     }
 
@@ -45,15 +45,15 @@ public abstract class Ship {
         }
     }
 
-    public List<Coordinate> getCoordinates() {
+    public List<Coordinates> getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(List<Coordinate> coordinates) {
+    public void setCoordinates(List<Coordinates> coordinates) {
         this.coordinates = coordinates;
     }
 
     public abstract int getSize();
     public abstract String getName();
-    public abstract boolean isSunk();
+    public abstract boolean isSunk(); // fixme always returns true when hit
 }

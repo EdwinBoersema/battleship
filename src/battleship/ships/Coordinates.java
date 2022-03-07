@@ -2,22 +2,22 @@ package battleship.ships;
 
 import java.util.Arrays;
 
-public class Coordinate {
+public class Coordinates {
     public int x;
     public int y;
 
-    public Coordinate(int x, int y) {
+    public Coordinates(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof Coordinate)) {
+        if (!(obj instanceof Coordinates)) {
             return false;
         }
-        return this.x == ((Coordinate) obj).x &&
-                this.y == ((Coordinate) obj).y;
+        return this.x == ((Coordinates) obj).x &&
+                this.y == ((Coordinates) obj).y;
     }
 
     @Override
