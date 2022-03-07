@@ -6,27 +6,13 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public abstract class Player {
-    protected HashMap<Coordinates, String> grid; // todo move to human player
-    protected HashMap<Coordinates, String> opponentGrid; // todo move to human player
     protected Ship[] ships;
     protected String name;
     protected List<Coordinates> shots = new ArrayList<>();
 
     public Player(String name) {
         this.name = name;
-        this.createGrids();
         this.createShips();
-    }
-
-    private void createGrids() {
-        grid = new HashMap<>();
-        opponentGrid = new HashMap<>();
-        for (int y = 1; y <= 10; y++) {
-            for (int x = 1; x <= 10; x++) {
-                grid.put(new Coordinates(x, y), ".");
-                opponentGrid.put(new Coordinates(x,y), ".");
-            }
-        }
     }
 
     private void createShips() {
@@ -36,8 +22,6 @@ public abstract class Player {
         ships[2] = new Cruiser();
         ships[3] = new Submarine();
         ships[4] = new Destroyer();
-
-//        ships = new Ship[]{new Destroyer()};
     }
 
     // check horizontal coordinates
@@ -113,24 +97,8 @@ public abstract class Player {
                 .toList();
     }
 
-    public HashMap<Coordinates, String> getGrid() {
-        return grid;
-    }
-
     public List<Coordinates> getShots() {
         return shots;
-    }
-
-    public void updateGrid(Coordinates coordinate, String symbol) {
-        grid.put(coordinate, symbol);
-    }
-
-    public HashMap<Coordinates, String> getOpponentGrid() {
-        return opponentGrid;
-    }
-
-    public void updateOpponentGrid(Coordinates coordinate, String symbol) {
-        opponentGrid.replace(coordinate, symbol);
     }
 
     public void updateShotsGrid(Coordinates coordinate) {

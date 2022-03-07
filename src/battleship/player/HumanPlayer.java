@@ -5,12 +5,27 @@ import battleship.ships.Coordinates;
 import battleship.ships.Ship;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class HumanPlayer extends Player{
+    protected HashMap<Coordinates, String> grid;
+    protected HashMap<Coordinates, String> opponentGrid;
 
     public HumanPlayer(String name) {
         super(name);
+        this.createGrids();
+    }
+
+    private void createGrids() {
+        grid = new HashMap<>();
+        opponentGrid = new HashMap<>();
+        for (int y = 1; y <= 10; y++) {
+            for (int x = 1; x <= 10; x++) {
+                grid.put(new Coordinates(x, y), ".");
+                opponentGrid.put(new Coordinates(x,y), ".");
+            }
+        }
     }
 
     @Override
@@ -60,6 +75,7 @@ public class HumanPlayer extends Player{
     private Coordinates getCoordinates(String message) {
         String characterArray = "abcdefghij";
         while (true) {
+            // ask for coordinates
             String input = IOUtil.askInput(message);
             try {
                 String letter = input.substring(0,1).toLowerCase();
@@ -102,7 +118,6 @@ public class HumanPlayer extends Player{
         }
     }
 
-
     @Override
     public String notify(boolean hit, Ship ship) {
         if (ship != null && ship.isSunk()) {
@@ -111,5 +126,21 @@ public class HumanPlayer extends Player{
             String result = hit ? "hit" : "miss";
             return String.format("It's a %s!", result);
         }
+    }
+
+    public HashMap<Coordinates, String> getGrid() {
+        return grid;
+    }
+
+    public void updateGrid(Coordinates coordinate, String symbol) {
+        grid.put(coordinate, symbol);
+    }
+
+    public HashMap<Coordinates, String> getOpponentGrid() {
+        return opponentGrid;
+    }
+
+    public void updateOpponentGrid(Coordinates coordinate, String symbol) {
+        opponentGrid.replace(coordinate, symbol);
     }
 }
