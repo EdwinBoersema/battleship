@@ -6,7 +6,7 @@ import java.util.List;
 public abstract class Ship {
     private final String horizontalAscii;
     private final String verticalAscii;
-    private boolean horizontalAlignment;
+    private boolean orientation;
     private List<Coordinates> coordinates = new ArrayList<>();
     protected final String NAME;
     protected final int SIZE;
@@ -21,15 +21,15 @@ public abstract class Ship {
     }
 
     public String getAscii(int index) {
-        if (horizontalAlignment) {
+        if (orientation) {
             return String.valueOf(horizontalAscii.toCharArray()[index]);
         } else {
             return String.valueOf(verticalAscii.toCharArray()[index]);
         }
     }
 
-    public void setHorizontalAlignment(boolean alignment) {
-        this.horizontalAlignment = alignment;
+    public void setOrientation(boolean alignment) {
+        this.orientation = alignment;
     }
 
     public boolean isHit(Coordinates coordinate) {
