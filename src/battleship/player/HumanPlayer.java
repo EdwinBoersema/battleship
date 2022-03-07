@@ -37,7 +37,7 @@ public class HumanPlayer extends Player{
             boolean orientation = false;
             List<Coordinates> coordinatesList = new ArrayList<>();
             while (!valid) {
-                Coordinates coordinates = getCoordinates(String.format("Type where you would like to put your %s at: ", ship.getName()));
+                Coordinates coordinates = getCoordinates(String.format("Type the starting point where you would like to put your %s at: ", ship.getName()));
                 orientation = getOrientation();
                 coordinatesList = checkCoordinates(coordinates, orientation, ship.getSize());
                 valid = coordinatesList.size() == ship.getSize();
@@ -64,9 +64,9 @@ public class HumanPlayer extends Player{
             try {
                 String letter = input.substring(0,1).toLowerCase();
                 // parse 2nd character to integer
-                int y = Integer.parseInt(input.substring(1,2));
+                int y = Integer.parseInt(input.substring(1));
                 // check if input matches expected format
-                if (letter.matches("[a-i]") &&
+                if (letter.matches("[a-j]") &&
                         (y > 0 && y <= 10)) {
                     // convert input into coordinate
                     int x = characterArray.indexOf(letter) + 1;
