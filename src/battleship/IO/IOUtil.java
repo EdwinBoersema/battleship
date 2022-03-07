@@ -17,8 +17,9 @@ public class IOUtil {
                 |_.__/ \\__,_|\\__|\\__|_|\\___||___/_| |_|_| .__/
                                                         | |
                                                         |_|""");
-        System.out.println();
+        System.out.print("\n");
         System.out.println("Welcome to Battleship!");
+        System.out.println("\n");
     }
 
     public static String askInput(String question) {
@@ -34,7 +35,7 @@ public class IOUtil {
     }
 
     public static void printGrid(HashMap<Coordinates, String> grid) {
-        printHorizontalIdentifiers();
+        System.out.println("    A  B  C  D  E  F  G  H  I  J");
         for (int y = 1; y <= 10; y++) {
             System.out.printf("%02d", y);
             for (int x = 1; x <= 10; x++) {
@@ -44,7 +45,20 @@ public class IOUtil {
         }
     }
 
-    private static void printHorizontalIdentifiers() {
-        System.out.println("    A  B  C  D  E  F  G  H  I  J");
+    public static void printDisplays(HashMap<Coordinates, String> grid1, HashMap<Coordinates, String> grid2) {
+        System.out.println("             Your sea                         Your opponents sea    ");
+        System.out.println("    A  B  C  D  E  F  G  H  I  J        A  B  C  D  E  F  G  H  I  J");
+        for (int y = 1; y <= 10; y++) {
+            System.out.printf("%02d", y);
+            for (int x = 1; x <= 10; x++) {
+                System.out.print("  " + grid1.get(new Coordinates(x,y)));
+            }
+            System.out.print("    ");
+            System.out.printf("%02d", y);
+            for (int x = 1; x <= 10; x++) {
+                System.out.print("  " + grid2.get(new Coordinates(x,y)));
+            }
+            System.out.println();
+        }
     }
 }
