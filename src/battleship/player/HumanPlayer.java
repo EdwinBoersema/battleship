@@ -1,7 +1,8 @@
 package battleship.player;
 
 import battleship.IO.IOUtil;
-import battleship.ships.Coordinate;
+import battleship.ships.Coordinates;
+import battleship.ships.Ship;
 
 public class HumanPlayer extends Player{
 
@@ -10,7 +11,7 @@ public class HumanPlayer extends Player{
     }
 
     @Override
-    public Coordinate play() {
+    public Coordinates play() {
         String characterArray = "abcdefghij";
 
         // get valid coordinate
@@ -25,8 +26,7 @@ public class HumanPlayer extends Player{
                         (y > 0 && y <= 10)) {
                     // convert input into coordinate
                     int x = characterArray.indexOf(letter) + 1;
-                    System.out.println(letter + x);
-                    Coordinate shot = new Coordinate(x, y);
+                    Coordinates shot = new Coordinates(x, y);
                     if (shots.contains(shot)) {
                         // if coordinate has been tried already, notify user
                         IOUtil.printExclamation("That coordinate has been tried already, guess again.");
@@ -40,6 +40,16 @@ public class HumanPlayer extends Player{
             } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
                 System.out.println("Invalid input, a valid input would be: \"E3\"");
             }
+        }
+    }
+
+    @Override
+    public String notify(boolean hit, Ship ship) {
+        if (ship != null && ship.isSunk()) {
+            return String.format("You sunk the enemies %s!", ship.getName());
+        } else {
+            String result = hit ? "hit" : "miss";
+            return String.format("It's a %s!", result);
         }
     }
 }

@@ -1,7 +1,5 @@
 package battleship.player;
 
-import battleship.IO.Shot;
-import battleship.game.State;
 import battleship.ships.*;
 
 import java.util.*;
@@ -9,11 +7,11 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public abstract class Player {
-    protected HashMap<Coordinate, String> grid;
-    protected HashMap<Coordinate, String> opponentGrid; // todo move to human player
+    protected HashMap<Coordinates, String> grid;
+    protected HashMap<Coordinates, String> opponentGrid; // todo move to human player
     protected Ship[] ships;
     protected String name;
-    protected List<Coordinate> shots = new ArrayList<>();
+    protected List<Coordinates> shots = new ArrayList<>();
 
     public Player(String name) {
         this.name = name;
@@ -26,19 +24,21 @@ public abstract class Player {
         opponentGrid = new HashMap<>();
         for (int y = 1; y <= 10; y++) {
             for (int x = 1; x <= 10; x++) {
-                grid.put(new Coordinate(x, y), ".");
-                opponentGrid.put(new Coordinate(x,y), ".");
+                grid.put(new Coordinates(x, y), ".");
+                opponentGrid.put(new Coordinates(x,y), ".");
             }
         }
     }
 
     private void createShips() {
-        ships = new Ship[5];
-        ships[0] = new Carrier();
-        ships[1] = new Battleship();
-        ships[2] = new Cruiser();
-        ships[3] = new Submarine();
-        ships[4] = new Destroyer();
+//        ships = new Ship[5];
+//        ships[0] = new Carrier();
+//        ships[1] = new Battleship();
+//        ships[2] = new Cruiser();
+//        ships[3] = new Submarine();
+//        ships[4] = new Destroyer();
+
+        ships = new Ship[]{new Destroyer()};
     }
 
     /*
@@ -47,74 +47,76 @@ public abstract class Player {
      * and places the ship's ascii in the grid
      */
     public void placeShips() {
+        System.out.printf("placing %s's ships%n", this.name);
         for (Ship ship : ships) {
-            List<Coordinate> coordinates = getValidCoordinates(ship);
+            List<Coordinates> coordinatesList = getValidCoordinates(ship);
             // set ship coordinates and add coordinates to the grid
-            ship.setCoordinates(coordinates);
+            ship.setCoordinates(coordinatesList);
             for (int i = 0; i < ship.getSize(); i ++) {
-                Coordinate coordinate = coordinates.get(i);
+                Coordinates coordinate = coordinatesList.get(i);
                 grid.replace(coordinate, ship.getAscii(i));
             }
 
+
             System.out.printf("%s at coordinates: ", ship.getName()); // todo remove after testing
-            coordinates.forEach(System.out::print);
+            coordinatesList.forEach(System.out::print);
             System.out.print("\n");
         }
 
     }
 
-    private List<Coordinate> getValidCoordinates(Ship ship) {
+    private List<Coordinates> getValidCoordinates(Ship ship) {
         Supplier<Integer> randomInt = () -> new Random().nextInt(1, 11);
         Supplier<Boolean> randomBoolean = () -> new Random().nextBoolean();
 
-        boolean validCoordinate = false;
-        List<Coordinate> coordinates = new ArrayList<>();
+        List<Coordinates> coordinatesList;
         // check new coordinates until a valid row or column of Coordinates is found
-        while (!validCoordinate) {
-            Coordinate randomCoordinate = new Coordinate(randomInt.get(), randomInt.get());
+        while (true) {
+            Coordinates randomCoordinate = new Coordinates(randomInt.get(), randomInt.get());
             // get horizontal or vertical coordinates depending on the random boolean
             if (randomBoolean.get()) {
-                coordinates = getHorizontalCoordinates(randomCoordinate, ship.getSize());
+                coordinatesList = getHorizontalCoordinates(randomCoordinate, ship.getSize());
                 // set ship's alignment
                 ship.setHorizontalAlignment(true);
             } else {
-                coordinates = getVerticalCoordinates(randomCoordinate, ship.getSize());
+                coordinatesList = getVerticalCoordinates(randomCoordinate, ship.getSize());
                 // set ship's alignment
                 ship.setHorizontalAlignment(false);
             }
-            // update boolean
-            validCoordinate = coordinates.size() == ship.getSize();
+            // check list
+            if (coordinatesList.size() == ship.getSize()) {
+                return coordinatesList;
+            }
         }
-        return coordinates;
     }
 
     // check horizontal coordinates
-    private List<Coordinate> getHorizontalCoordinates(Coordinate startingCoordinate,int length) {
+    private List<Coordinates> getHorizontalCoordinates(Coordinates startingCoordinate, int length) {
         // determine the number of integers generated
-        int end = (startingCoordinate.x + length) >= 9 ? 10 - startingCoordinate.x : length;
+        int end = (startingCoordinate.x + length) >= 10 ? 10 - startingCoordinate.x : length;
 
         // get empty coordinates
         return Stream.iterate(startingCoordinate.x, n -> n + 1)
                 .limit(end)
-                .map(x -> new Coordinate(x, startingCoordinate.y))
+                .map(x -> new Coordinates(x, startingCoordinate.y))
                 .filter(this::isEmpty)
                 .toList();
     }
 
     // check vertical coordinates
-    private List<Coordinate> getVerticalCoordinates(Coordinate startingCoordinate,int length) {
+    private List<Coordinates> getVerticalCoordinates(Coordinates startingCoordinate, int length) {
         // determine the number of integers generated
-        int end = (startingCoordinate.y + length) >= 9 ? 10 - startingCoordinate.y : length;
+        int end = (startingCoordinate.y + length) >= 10 ? 10 - startingCoordinate.y : length;
 
         // get empty coordinates
         return Stream.iterate(startingCoordinate.y, n -> n + 1)
                 .limit(end)
-                .map(y -> new Coordinate(startingCoordinate.x, y))
+                .map(y -> new Coordinates(startingCoordinate.x, y))
                 .filter(this::isEmpty)
                 .toList();
     }
 
-    public boolean isEmpty(Coordinate coordinate) {
+    public boolean isEmpty(Coordinates coordinate) {
         boolean empty = Stream.of(
                 getShipCoordinates(),
                 shots)
@@ -123,15 +125,19 @@ public abstract class Player {
         return !empty;
     }
 
-    public Optional<Ship> handleHit(Coordinate coordinate) { // todo maybe move to Ship and make static methods ???
-        // check if the coordinate matches a ship's coordinate
-        Optional<Ship> shipOptional = Arrays.stream(ships)
-                .filter(s -> s.isHit(coordinate))
-                .findFirst();
-        // if the optional has a ship, update ship's hitCounter
-        shipOptional.ifPresent(Ship::updateHitCounter);
+    public Optional<Ship> handleHit(Coordinates coordinate) {
+        Optional<Ship> shipOptional = Optional.empty();
 
-        // return whether a ship was hit or not
+        // check for each ship if it's hit
+        for (Ship ship : ships) {
+            if (ship.isHit(coordinate)) {
+                // if it's hit, update optional
+                shipOptional = Optional.of(ship);
+                // update ship's hitCounter
+                ship.updateHitCounter();
+            }
+        }
+
         return shipOptional;
     }
 
@@ -143,36 +149,41 @@ public abstract class Player {
 
     // getters and setters
 
-    public List<Coordinate> getShipCoordinates() {
+    public List<Coordinates> getShipCoordinates() {
         return Arrays.stream(ships)
                 .map(Ship::getCoordinates)
                 .flatMap(Collection::stream)
                 .toList();
     }
 
-    public HashMap<Coordinate, String> getGrid() {
+    public HashMap<Coordinates, String> getGrid() {
         return grid;
     }
 
-    public List<Coordinate> getShots() {
+    public List<Coordinates> getShots() {
         return shots;
     }
 
-    public void updateGrid(Coordinate coordinate, Shot shot) {
-        grid.put(coordinate, shot.value);
+    public void updateGrid(Coordinates coordinate, String symbol) {
+        grid.put(coordinate, symbol);
     }
 
-    public HashMap<Coordinate, String> getOpponentGrid() {
+    public HashMap<Coordinates, String> getOpponentGrid() {
         return opponentGrid;
     }
 
-    public void updateOpponentGrid(Coordinate coordinate, Shot shot) {
-        opponentGrid.replace(coordinate, shot.value);
+    public void updateOpponentGrid(Coordinates coordinate, String symbol) {
+        opponentGrid.replace(coordinate, symbol);
     }
 
-    public void updateShotsGrid(Coordinate coordinate) {
+    public void updateShotsGrid(Coordinates coordinate) {
         shots.add(coordinate);
     }
 
-    public abstract Coordinate play();
+    public String getName() {
+        return name;
+    }
+
+    public abstract Coordinates play();
+    public abstract String notify(boolean hit, Ship ship);
 }
