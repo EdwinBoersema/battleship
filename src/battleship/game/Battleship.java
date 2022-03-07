@@ -13,6 +13,9 @@ import java.util.Random;
 
 public class Battleship implements Game{
     private ArrayList<Player> players = new ArrayList<>();
+    State gameState = State.VALID;
+    Player currentPlayer;
+    Player nextPlayer;
 
 
     public Battleship() {
@@ -22,8 +25,8 @@ public class Battleship implements Game{
     public Game createGame() {
         IOUtil.printStartScreen();
         // create players
-//        String playerName = IOUtil.askInput("Enter your name: "); // todo remove after testing
-        String playerName = "Edwin";
+//        String playerName = IOUtil.askInput("Enter your name: ");
+        String playerName = "Edwin";// todo remove after testing
         Player human = new HumanPlayer(playerName);
         human.placeShips(); // todo remove after testing
 
@@ -35,8 +38,7 @@ public class Battleship implements Game{
         IOUtil.printExclamation("Below you see your sea.");
         IOUtil.printGrid(human.getGrid());
         IOUtil.printExclamation("And your opponents sea with your shots.");
-        IOUtil.printExclamation("An 'X' marks a hit, a '+" +
-                "' marks a miss.");
+        IOUtil.printExclamation("An 'X' marks a hit, a '+' marks a miss.");
         IOUtil.printGrid(human.getOpponentGrid());
 
         // fill grids
@@ -50,11 +52,8 @@ public class Battleship implements Game{
     public Game startGame() {
         // loop through players
         // pick a random player to start
-        Player currentPlayer = players.get(new Random().nextInt(0,2)); // todo refactor into instance variables
-        Player otherPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1); // todo maybe change with counter for easier assigning of players
-//        Player currentPlayer = players.get(0);
-//        Player otherPlayer = players.get(1);
-        State gameState= State.VALID;
+        currentPlayer = players.get(new Random().nextInt(0,2));
+        nextPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
         while (gameState == State.VALID) {
             if (currentPlayer instanceof HumanPlayer) {
                 // print out boards
@@ -66,48 +65,58 @@ public class Battleship implements Game{
             Coordinates coordinate = currentPlayer.play();
 
             // check if a ship is hit
-            Optional<Ship> shipOptional = otherPlayer.handleHit(coordinate);
-            // set name and shot variables depending on the Optional
-            Ship ship = shipOptional.orElse(null);
+            Optional<Ship> shipOptional = nextPlayer.handleHit(coordinate);
 
             //print out result
-            String message = currentPlayer.notify(shipOptional.isPresent(), ship);
+            String message = currentPlayer.notify(shipOptional.isPresent(), shipOptional.orElse(null));
             IOUtil.printExclamation(message);
+            // let the computer wait for a second so the player can see what happens
             if (currentPlayer instanceof ComputerPlayer) {
                 ((ComputerPlayer) currentPlayer).sleep(1);
             }
 
             // update grids
-            updateGrids(coordinate, shipOptional.isPresent(), currentPlayer, otherPlayer);
+            updateGrids(coordinate, shipOptional.isPresent(), currentPlayer, nextPlayer);
 
-            // validate gameState // todo refactor into method
-            if (otherPlayer.areAllShipsSunken()) {
-                Player playerOne = players.get(0);
-                gameState = currentPlayer.equals(playerOne) ? State.PLAYER_ONE_WON : State.PLAYER_TWO_WON;
-            }
+            // validate gameState
+            validateGameState();
 
-            // change players // todo refactor into method
-            currentPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
-            otherPlayer = otherPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
+            // change players
+            switchPlayers();
         }
-
         // print out end message
-        String winner;
-        if (gameState == State.PLAYER_ONE_WON) { // todo move to IOUtils
-            winner = players.get(0).getName();
-        } else {
-            winner = players.get(1).getName();
-        }
-        IOUtil.printExclamation(String.format("%s has won!", winner));
+        String message = getEndMessage();
+        IOUtil.printExclamation(message);
 
         return this;
     }
 
-    private void updateGrids(Coordinates coordinate, boolean hit, Player currentPlayer, Player otherPlayer) {
+    private void updateGrids(Coordinates coordinate, boolean hit, Player currentPlayer, Player nextPlayer) {
         var symbol = hit ? "X" : "+";
         currentPlayer.updateShotsGrid(coordinate);
         currentPlayer.updateOpponentGrid(coordinate, symbol);
-        otherPlayer.updateGrid(coordinate, symbol);
+        nextPlayer.updateGrid(coordinate, symbol);
     }
 
+    private void validateGameState() {
+        if (nextPlayer.areAllShipsSunken()) {
+            Player playerOne = players.get(0);
+            gameState = currentPlayer.equals(playerOne) ? State.PLAYER_ONE_WON : State.PLAYER_TWO_WON;
+        }
+    }
+
+    private void switchPlayers() {
+        currentPlayer = currentPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
+        nextPlayer = nextPlayer.equals(players.get(1)) ? players.get(0) : players.get(1);
+    }
+
+    private String getEndMessage() {
+        String winner;
+        if (gameState == State.PLAYER_ONE_WON) {
+            winner = players.get(0).getName();
+        } else {
+            winner = players.get(1).getName();
+        }
+        return String.format("%s has won!", winner);
+    }
 }
