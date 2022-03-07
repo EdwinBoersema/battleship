@@ -32,13 +32,10 @@ public class Battleship implements Game{
         players.add(human);
         players.add(new ComputerPlayer());
 
-        IOUtil.printExclamation("Welcome " + playerName + ", we're going to play a game of Battleship.");
+        IOUtil.printExclamation("Hello " + playerName + ", we're going to play a game of Battleship.");
         // initialize grids
-        IOUtil.printExclamation("Below you see your sea.");
-        IOUtil.printGrid(human.getGrid());
-        IOUtil.printExclamation("And your opponents sea with your shots.");
-        IOUtil.printExclamation("An 'X' marks a hit, a '+' marks a miss.");
-        IOUtil.printGrid(human.getOpponentGrid());
+        IOUtil.printExclamation("Below you see your sea.                And your opponents sea with your shots. (An 'X' marks a hit, a '+' marks a miss.)");
+        IOUtil.printDisplays(human.getGrid(), human.getOpponentGrid());
 
         // place ships
         players.forEach(Player::placeShips);
@@ -54,8 +51,7 @@ public class Battleship implements Game{
         while (gameState == State.VALID) {
             if (currentPlayer instanceof HumanPlayer) {
                 // print out boards
-                IOUtil.printGrid(currentPlayer.getGrid());
-                IOUtil.printGrid(currentPlayer.getOpponentGrid());
+                IOUtil.printDisplays(currentPlayer.getGrid(), currentPlayer.getOpponentGrid());
             }
 
             // get coordinate
