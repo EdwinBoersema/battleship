@@ -11,6 +11,11 @@ public class Coordinates {
         this.y = y;
     }
 
+    public Coordinates(Coordinates coordinates) {
+        this.x = coordinates.x;
+        this.y = coordinates.y;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Coordinates)) {

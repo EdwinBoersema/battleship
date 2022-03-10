@@ -64,9 +64,13 @@ public class Battleship implements Game{
             //print out result
             String message = currentPlayer.notify(shipOptional.isPresent(), shipOptional.orElse(null));
             IOUtil.printExclamation(message);
-            // let the computer wait for a second so the player can see what happens
             if (currentPlayer instanceof ComputerPlayer) {
-                ((ComputerPlayer) currentPlayer).sleep(1);
+                ComputerPlayer player = (ComputerPlayer) currentPlayer;
+                // let the computer wait for a second so the player can see what happens
+                player.sleep(1);
+                // update computer's trackers
+                boolean sunkOpponentShip = shipOptional.isPresent() && shipOptional.get().isSunk();
+                player.updateTrackers(shipOptional.isPresent(), sunkOpponentShip);
             }
 
             // update grids
@@ -79,8 +83,7 @@ public class Battleship implements Game{
             switchPlayers();
         }
         // print out end message
-        String message = getEndMessage();
-        IOUtil.printExclamation(message);
+        IOUtil.printExclamation(getEndMessage());
 
         return this;
     }
