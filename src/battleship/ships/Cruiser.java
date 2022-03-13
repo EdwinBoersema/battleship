@@ -23,6 +23,6 @@ public class Cruiser extends Ship {
 
     @Override
     public boolean isSunk() {
-        return isSunk;
+        return hitCounter == SIZE;
     }
 }

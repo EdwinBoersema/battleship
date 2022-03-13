@@ -2,6 +2,7 @@ package battleship.ships;
 
 import java.util.Arrays;
 
+// wrapper class used for the Player HashMap
 public class Coordinates {
     public int x;
     public int y;

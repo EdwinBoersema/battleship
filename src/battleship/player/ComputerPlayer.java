@@ -10,26 +10,31 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class ComputerPlayer extends Player{
     private Coordinates lastShot;
     private Coordinates lastHit;
-    private Coordinates nextShot;
-    private List<Coordinates> firingSequence = new ArrayList<>();
-    private List<Coordinates> shotsToCheck = new ArrayList<>();
+    private final List<Coordinates> firingSequence = new ArrayList<>();
     int firingOrientation;
 
     public ComputerPlayer() {
         super("computer");
     }
 
+    /*
+     * gets the computer's next coordinates based on previous results,
+     * and notifies the human player what coordinate is being targeted
+     */
     @Override
     public Coordinates play() {
         // wait one second so the player can see what the computer does
         sleep(1);
 
+        // get the next coordinates
         Coordinates coordinates = getTargetCoordinates();
-//        System.out.println("Computer tries: " + coordinates); // todo translate to coordinate i.e. "A2" --> refactor into IOUtil method
+
+        // print out the next coordinates to the console
         IOUtil.printComputerCoordinates(coordinates);
         // set lastShot coordinates
         lastShot = new Coordinates(coordinates);
@@ -46,13 +51,6 @@ public class ComputerPlayer extends Player{
             List<Coordinates> coordinatesList = getValidCoordinates(ship);
             // set ship coordinates and add coordinates to the grid
             ship.setCoordinates(coordinatesList);
-            for (int i = 0; i < ship.getSize(); i ++) {
-                Coordinates coordinate = coordinatesList.get(i);
-            }
-
-            System.out.printf("%s at coordinates: ", ship.getName()); // todo remove after testing
-            coordinatesList.forEach(System.out::print);
-            System.out.print("\n");
         }
 
     }
@@ -82,6 +80,7 @@ public class ComputerPlayer extends Player{
         }
     }
 
+    // notifies the human player of the result of the computer's turn
     @Override
     public String notify(boolean hit, Ship ship) {
         // wait one second so the player can see what the computer does
@@ -95,6 +94,7 @@ public class ComputerPlayer extends Player{
         }
     }
 
+    // makes the computer wait for x seconds
     public void sleep(long seconds) {
         try {
             TimeUnit.SECONDS.sleep(seconds);
@@ -103,10 +103,8 @@ public class ComputerPlayer extends Player{
 
     // methods to determine the computers next guess
 
+    // gets the next target coordinate
     private Coordinates getTargetCoordinates() {
-        if (nextShot != null) {
-            return nextShot;
-        }
         if (lastHit != null) {
             // check the lastHit's adjacent coordinates
             Optional<Coordinates> targetCoordinates = checkAdjacentCoordinates();
@@ -119,6 +117,12 @@ public class ComputerPlayer extends Player{
         }
     }
 
+    /*
+     * checks the lastHit's adjacent coordinates depending on the firing orientation
+     * random one when orientation == 0
+     * horizontal for when orientation == 1
+     * vertical when orientation == 2
+     */
     private Optional<Coordinates> checkAdjacentCoordinates() {
         Optional<Coordinates> optionalCoordinates;
         // check horizontal or vertical adjacent coordinates based on firingOrientation
@@ -140,39 +144,29 @@ public class ComputerPlayer extends Player{
 
     // checks adjacent horizontal coordinates
     private Optional<Coordinates> checkHorizontalTargets() {
-        // make a list of the two horizontal adjacent coordinates
-        List<Coordinates> list = List.of(
-                new Coordinates(lastHit.x + 1, lastHit.y),
-                new Coordinates(lastHit.x - 1, lastHit.y)
-        );
-        // check if coordinate is empty, return first empty coordinate or empty Optional
-        return list.stream()
+        // returns the first horizontal adjacent coordinate that's within bounds and not yet used
+        return Stream.of(
+                        new Coordinates(lastHit.x + 1, lastHit.y),
+                        new Coordinates(lastHit.x - 1, lastHit.y))
                 .filter(this::isWithinBounds)
                 .filter(c -> !shots.contains(c))
-//                .peek(c -> System.out.print("checking: " + c)) // todo remove
                 .findFirst();
     }
 
     // checks adjacent horizontal coordinates
     private Optional<Coordinates> checkVerticalTargets() {
-        // make a list of the two vertical adjacent coordinates
-        List<Coordinates> list = List.of(
+        // returns the first vertical adjacent coordinate that's within bounds and not yet used
+        return Stream.of(
                 new Coordinates(lastHit.x, lastHit.y + 1),
-                new Coordinates(lastHit.x, lastHit.y - 1)
-        );
-        // check if coordinate is empty, return first empty coordinate or empty Optional
-        return list.stream()
+                new Coordinates(lastHit.x, lastHit.y - 1))
                 .filter(this::isWithinBounds)
                 .filter(c -> !shots.contains(c))
-//                .peek(c -> System.out.print("checking: " + c)) // todo remove
                 .findFirst();
     }
 
     // loops through random coordinates until a valid empty one is found
     private Coordinates getRandomTargetCoordinates() {
         Supplier<Integer> r = () -> new Random().nextInt(1, 11);
-//        System.out.println("picking random coordinates"); // todo remove
-
         while(true) {
             Coordinates targetCoordinates = new Coordinates(r.get(), r.get());
             // validate that coordinate is valid
@@ -183,16 +177,13 @@ public class ComputerPlayer extends Player{
         }
     }
 
+    // returns whether the provided coordinates fall within the grids bounds
     private boolean isWithinBounds(Coordinates coordinates) {
         return coordinates.x > 0 &&
                 coordinates.x <= 10 &&
                 coordinates.y > 0 &&
                 coordinates.y <= 10;
     }
-//
-//    private Coordinates getNextShot() {
-//
-//    }
 
     /*
      * sets the firing orientation depending on the values of the 2 last hits
@@ -212,11 +203,10 @@ public class ComputerPlayer extends Player{
             firingOrientation = 2;
         } else {
             firingOrientation = 0;
-            //put diagonal coordinate is separate tracker for later
-            shotsToCheck.add(lastShot);
         }
     }
 
+    // updates the computer's trackers
     public void updateTrackers(boolean hit, boolean sunkOpponentShip) {
         // reset trackers if the last shot sunk an enemy ship
         if (sunkOpponentShip) {
@@ -232,13 +222,10 @@ public class ComputerPlayer extends Player{
                 // add lastHit to the firingSequence
                 lastHit = new Coordinates(lastShot);
                 firingSequence.add(new Coordinates(lastHit));
-//                System.out.printf("adding %s to the firing sequence%n", lastHit); // todo remove print calls
             } else {
+                // if nothing was hit, but firing sequence is not empty, set lastHit to the first coordinates in the sequence
                 if (!firingSequence.isEmpty()) {
-//                    System.out.println("firing sequence: " + firingSequence);
                     lastHit = new Coordinates(firingSequence.get(0));
-//                    System.out.printf("setting lastHit to: %s, orientation: %d%n", lastHit, firingOrientation);
-//                    nextShot = getNextShot();
                 }
             }
         }

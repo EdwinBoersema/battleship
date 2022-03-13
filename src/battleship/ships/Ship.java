@@ -20,6 +20,7 @@ public abstract class Ship {
         this.verticalAscii = verticalAscii;
     }
 
+    // gets the correct character to put in the grid
     public String getAscii(int index) {
         if (orientation) {
             return String.valueOf(horizontalAscii.toCharArray()[index]);
@@ -28,22 +29,25 @@ public abstract class Ship {
         }
     }
 
-    public void setOrientation(boolean alignment) {
-        this.orientation = alignment;
+    // sets the ship's orientation to either horizontal (true) or vertical (false)
+    public void setOrientation(boolean orientation) {
+        this.orientation = orientation;
     }
 
+    // compares a set of coordinates to the ships coordinates and returns whether it's hit
     public boolean isHit(Coordinates coordinate) {
         return coordinates.contains(coordinate);
     }
 
+    // updates the
     public void updateHitCounter() {
         if (hitCounter < SIZE) {
             hitCounter++;
         }
-        if (hitCounter == SIZE) {
-            this.isSunk = true;
-        }
     }
+
+    // compares the ship's size to it's hitCounter and returns a boolean
+    public abstract boolean isSunk();
 
     public List<Coordinates> getCoordinates() {
         return coordinates;
@@ -52,8 +56,6 @@ public abstract class Ship {
     public void setCoordinates(List<Coordinates> coordinates) {
         this.coordinates = coordinates;
     }
-
     public abstract int getSize();
     public abstract String getName();
-    public abstract boolean isSunk(); // fixme always returns true when hit
 }

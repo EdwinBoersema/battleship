@@ -37,7 +37,7 @@ public abstract class Player {
     }
 
     // check vertical coordinates
-    protected List<Coordinates> checkVerticalCoordinates(Coordinates startingCoordinate, int length) { // fixme doesn't properly work
+    protected List<Coordinates> checkVerticalCoordinates(Coordinates startingCoordinate, int length) {
         // determine the number of integers generated
         int limit = getLimit(startingCoordinate.y, length);
         // get empty coordinates
@@ -57,13 +57,17 @@ public abstract class Player {
         }
     }
 
+    /*
+     * get a stream of all the ships
+     * then get the coordinates of those ships
+     * then check if any of those coordinates match the given coordinate
+     */
     public boolean isEmpty(Coordinates coordinate) {
-        boolean empty = Stream.of(
-                getShipCoordinates(),
-                shots)
+        boolean occupied = Arrays.stream(ships)
+                .map(Ship::getCoordinates)
                 .flatMap(Collection::stream)
                 .anyMatch(c -> c.equals(coordinate));
-        return !empty;
+        return !occupied;
     }
 
     public Optional<Ship> handleHit(Coordinates coordinate) {
@@ -89,17 +93,6 @@ public abstract class Player {
     }
 
     // getters and setters
-
-    public List<Coordinates> getShipCoordinates() {
-        return Arrays.stream(ships)
-                .map(Ship::getCoordinates)
-                .flatMap(Collection::stream)
-                .toList();
-    }
-
-    public List<Coordinates> getShots() {
-        return shots;
-    }
 
     public void updateShotsGrid(Coordinates coordinate) {
         shots.add(coordinate);

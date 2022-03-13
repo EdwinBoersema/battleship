@@ -17,17 +17,19 @@ public class HumanPlayer extends Player{
         this.createGrids();
     }
 
+    // creates the player's grids for visual display
     private void createGrids() {
         grid = new HashMap<>();
         opponentGrid = new HashMap<>();
         for (int y = 1; y <= 10; y++) {
             for (int x = 1; x <= 10; x++) {
-                grid.put(new Coordinates(x, y), ".");
-                opponentGrid.put(new Coordinates(x,y), ".");
+                grid.put(new Coordinates(x, y), "~");
+                opponentGrid.put(new Coordinates(x,y), "~");
             }
         }
     }
 
+    // gets player input for the next target coordinates
     @Override
     public Coordinates play() {
         // get valid coordinate
@@ -43,6 +45,7 @@ public class HumanPlayer extends Player{
         }
     }
 
+    // lets the player place their ships
     @Override
     public void placeShips() {
         // loop through ships
@@ -67,11 +70,11 @@ public class HumanPlayer extends Player{
                 grid.put(coordinatesList.get(i), ship.getAscii(i));
             }
             ship.setCoordinates(coordinatesList);
-            // todo maybe print out grid after placing each ship for visual reference
             IOUtil.printGrid(grid);
         }
     }
 
+    // gets and validates coordinates for the next ship from the player
     private Coordinates getCoordinates(String message) {
         String characterArray = "abcdefghij";
         while (true) {
@@ -89,14 +92,18 @@ public class HumanPlayer extends Player{
                     return new Coordinates(x, y);
                 } else {
                     // if input doesn't match format, notify player and get input again
-                    System.out.println("Invalid input, a valid input would be: \"E3\"");
+                    IOUtil.printExclamation("Invalid input, a valid input would be: \"E3\"");
                 }
             } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-                System.out.println("Invalid input, a valid input would be: \"E3\"");
+                IOUtil.printExclamation("Invalid input, a valid input would be: \"E3\"");
             }
         }
     }
 
+    /*
+     * gets the orientation for the next ship from the player
+     * and converts it into a boolean
+     */
     private boolean getOrientation() {
         while (true) {
             String input = IOUtil.askInput("Now type the orientation of the ship (horizontal or vertical): ").toLowerCase();
@@ -110,6 +117,7 @@ public class HumanPlayer extends Player{
         }
     }
 
+    // checks the List of coordinates depending on the orientation
     private List<Coordinates> checkCoordinates(Coordinates coordinates, boolean orientation, int length) {
         if (orientation) {
             return checkHorizontalCoordinates(coordinates, length);
@@ -118,6 +126,7 @@ public class HumanPlayer extends Player{
         }
     }
 
+    // notifies the player of the result of their guess
     @Override
     public String notify(boolean hit, Ship ship) {
         if (ship != null && ship.isSunk()) {
